@@ -5,7 +5,7 @@ from rest_framework.validators import UniqueValidator
 from .models import User
 
 
-class Register(serializers.Serializer):
+class RegisterSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     username = serializers.CharField(
         max_length=20,
@@ -40,7 +40,7 @@ class Register(serializers.Serializer):
         return user
 
 
-class Login(serializers.Serializer):
+class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
     username = serializers.CharField(write_only=True)
 

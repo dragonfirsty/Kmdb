@@ -6,12 +6,12 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.views import APIView, Request, Response, status
 from rest_framework.exceptions import ValidationError
 from .models import User
-from .serializers import Login, Register, UserSerializer
+from .serializers import LoginSerializer, RegisterSerializer, UserSerializer
 
 
 class RegisterView(APIView):
     def post(self, request: Request) -> Response:
-        serializer = Register(data=request.data)
+        serializer = RegisterSerializer(data=request.data)
 
         serializer.is_valid(raise_exception=True)
 
@@ -26,7 +26,7 @@ class RegisterView(APIView):
 
 class LoginView(APIView):
     def post(self, request: Request) -> Response:
-        serializer = Login(data=request.data)
+        serializer = LoginSerializer(data=request.data)
 
         serializer.is_valid(raise_exception=True)
 
