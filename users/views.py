@@ -4,10 +4,10 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.views import APIView, Request, Response, status
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied
 from .models import User
 from .serializers import LoginSerializer, RegisterSerializer, UserSerializer
-
+from rest_framework.pagination import PageNumberPagination
 
 class RegisterView(APIView):
     def post(self, request: Request) -> Response:
@@ -44,17 +44,17 @@ class LoginView(APIView):
         )
 
 
-class ListUsersAdminView(APIView):
+class ListUsersAdminView(APIView,PageNumberPagination):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated,IsAdminUser]
 
     def get(self, request: Request) -> Response:
         user = User.objects.all()
+        result_page = self.paginate_queryset(user, request, view=self)
+        serializer = UserSerializer(result_page, many=True)
 
-        serializer = UserSerializer(user, many=True)
 
-
-        return Response(serializer.data)
+        return self.get_paginated_response(serializer.data)
 
 
 class UserView(APIView):
@@ -67,8 +67,8 @@ class UserView(APIView):
 
         serializer = UserSerializer(user)
         
-
         if request.user.id != user_id and request.user.is_superuser == False:
-            raise ValidationError({"detail" :"You do not have permission to perform this action."},403)
+            raise PermissionDenied({"detail" :"You do not have permission to perform this action."},403)
+        
 
         return Response(serializer.data, status.HTTP_200_OK)
