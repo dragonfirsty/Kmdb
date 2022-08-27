@@ -29,12 +29,13 @@ class MovieSerializer(serializers.Serializer):
 
     def update(self,instance: Movie,validated_data: dict,)-> Movie:
         
-        genres_data = validated_data.pop("genres")
-        if len(genres_data) > 0:
-            instance.genres.set([]) 
-            for value in genres_data:
-                genre, _ = Genre.objects.get_or_create(**value)
-                instance.genres.add(genre)
+        if 'genres' in validated_data:
+            genres_data = validated_data.pop("genres")
+            if len(genres_data) > 0:
+                instance.genres.set([]) 
+                for value in genres_data:
+                    genre, _ = Genre.objects.get_or_create(**value)
+                    instance.genres.add(genre)
 
         for key, value in validated_data.items():
             setattr(instance, key, value)
